@@ -148,7 +148,6 @@ StartPosition:
                                                 pobjSqlRas.ExecuteNonQuerry(mSQL)
 
                                                 mintWaitTime = 60
-                                                Exit For
                                             ElseIf pobjOdbc.UpdtErr.Contains("The given object ID """" in the field ""list id"" is invalid") Then
                                                 mSQL = "select ven.AOPListID " &
                                                  "from Vendor ven left join UNC_Payments unc on ven.RecID=unc.PayeeAccountID And unc.Status='OK' " &
@@ -160,23 +159,20 @@ StartPosition:
 
                                                     pobjSqlRas.ExecuteNonQuerry("update AopQueue set Querry='" & mQuerry & "' where recid=" & objRow("RecID"))
 
-                                                    mintWaitTime = 1
-                                                    Exit For
+                                                    mintWaitTime = 60
                                                 End If
                                             ElseIf pobjOdbc.UpdtErr.Contains("The currency of the account must be either in home currency or the transaction currency") Then
-                                                pobjSqlRas.ExecuteNonQuerry("update AopQueue set Status='XX' where RefNumber=" & objRow("RefNumber"))
+                                                pobjSqlRas.ExecuteNonQuerry("update AopQueue set Status='XX' where RefNumber='" & objRow("RefNumber") & "'")
 
                                                 mintWaitTime = 1
-                                                Exit For
                                             End If
-                                            mintWaitTime = 120
                                             '^_^20230224 add by 7643 -e-
                                         Else
                                             mintWaitTime = 120
                                         End If
                                         intElapsed = DateDiff(DateInterval.Second, dteStart, Now)
                                         TxtFeedBack.Text = Now & " " & objRow("LinkId") & " " & intElapsed & " " & objRow("B_I") & " " & objRow("TrxCode") & " FAILED !" & vbCrLf & TxtFeedBack.Text
-                                        pobjSqlRas.ExecuteNonQuerry("exec dbo.web_syncAOP")  '^_^20221123 add by 7643
+                                        'pobjSqlRas.ExecuteNonQuerry("exec dbo.web_syncAOP")  '^_^20221123 add by 7643
                                         Exit For
                                     End If
                             End Select
